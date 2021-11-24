@@ -21,6 +21,7 @@ public class ExampleQuery {
         query.FAIIR("Beef stew", cnnStr);
         query.FARWGTP("America", cnnStr);
         query.FARWGTP("Salty", "America", cnnStr);
+        query.FMR("Beef stew", cnnStr);
     }
 	
 	private void SelectAzureSQL(String sql, String cnnStr) {
@@ -67,7 +68,8 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 	}
-	
+
+	// find nutrition of an ingredient
 	private void FNOAI(String ingre_Name, String cnnStr) {
 		System.out.println("Looking for nutrition detail for " + ingre_Name);
 		String sql = "Select * From [Nutrition] Where [Nutrition_ID] = (Select [Nutrition_ID] From [Contains] Where [Ingredient_Name] = '" + ingre_Name + "')";
@@ -157,4 +159,20 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 	}
+	// find nutrition of a recipe
+	private void FMR(String recipe_name, String cnnStr){
+		System.out.println("Looking for macros of " + recipe_name);
+		String sql="Select n1.Grams_Protien, n1.Grams_Carbs, n1.Grams_Fat From [Nutrition] as n1, [Macro_Contents] as m1 Where (m1.Recipe_Name='"+recipe_name+"') and (n1.Nutrition_ID=m1.Nutrition_ID)";
+		ResultSet macros=null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			macros = statement.executeQuery(sql);
+			while(macros.next()) {
+				System.out.println("Protien(g): "+ macros.getString("Grams_Protien")+" Carbs(g): "+ macros.getString("Grams_Carbs")+ " Fat(g): "+ macros.getString("Grams_Fat"));
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
