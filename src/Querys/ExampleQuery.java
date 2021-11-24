@@ -70,7 +70,7 @@ public class ExampleQuery {
 	}
 
 	// find nutrition of an ingredient
-	private void FNOAI(String ingre_Name, String cnnStr) {
+	private ResultSet FNOAI(String ingre_Name, String cnnStr) {
 		System.out.println("Looking for nutrition detail for " + ingre_Name);
 		String sql = "Select * From [Nutrition] Where [Nutrition_ID] = (Select [Nutrition_ID] From [Contains] Where [Ingredient_Name] = '" + ingre_Name + "')";
 		ResultSet resultSet = null;
@@ -83,10 +83,11 @@ public class ExampleQuery {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return resultSet;
 	}
 
 	//find daily nutritional values for users
-	private void FDNFU(String user_ID, String cnnStr) {
+	private ResultSet FDNFU(String user_ID, String cnnStr) {
 		System.out.println("Looking for User" + user_ID + "'s daily nutrition");
 		String sql = "Select * From [User] Where [User_ID] = " + user_ID;
 		ResultSet resultSet = null;
@@ -99,10 +100,11 @@ public class ExampleQuery {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return resultSet;
 	}
 
 	// find all ingredients in a recipe
-	private void FAIIR(String resp_Name, String cnnStr) {
+	private ResultSet FAIIR(String resp_Name, String cnnStr) {
 		System.out.println("Looking for all ingredient needed for " + resp_Name);
 		String sql = "Select * From [Uses] Where [Recipe_Name] = '" + resp_Name +"'";
 		ResultSet resultSet = null;
@@ -115,10 +117,11 @@ public class ExampleQuery {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return resultSet;
 	}
 
 	// find all recipes with general taste profile?
-	private void FARWGTP(String taste_Profile, String cnnStr) {
+	private ResultSet FARWGTP(String taste_Profile, String cnnStr) {
 		System.out.println("Looking for all recipe with " + taste_Profile);
 		String sql = "Select * From [Taste_Profile] Where [Taste] = '" + taste_Profile +"'";
 		ResultSet resultSet = null;
@@ -142,25 +145,27 @@ public class ExampleQuery {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return resultSet;
 	}
 
 	// find all ingredients with general taste profile and region
-	private void FARWGTP(String taste, String region, String cnnStr) {
+	private ResultSet FARWGTP(String taste, String region, String cnnStr) {
 		System.out.println("Looking for all recipe with " + taste + " and " + region);
 		String sql = "Select * From [Taste_Profile] Where [Taste] = '" + taste +"' and [Region] = '" + region + "'";
 		ResultSet resultSet = null;
 		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
 			resultSet = statement.executeQuery(sql);
 			while(resultSet.next()) {
-				System.out.println("Recipe Name: " + resultSet.getString(1)+ ";   Dietary Restriction: " + resultSet.getString(4));
+				System.out.println("Recipe Name: " + resultSet.getString(1) + ";   Dietary Restriction: " + resultSet.getString(4));
 			}
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return resultSet;
 	}
 	// find nutrition of a recipe
-	private void FMR(String recipe_name, String cnnStr){
+	private ResultSet FMR(String recipe_name, String cnnStr){
 		System.out.println("Looking for macros of " + recipe_name);
 		String sql="Select n1.Grams_Protien, n1.Grams_Carbs, n1.Grams_Fat From [Nutrition] as n1, [Macro_Contents] as m1 Where (m1.Recipe_Name='"+recipe_name+"') and (n1.Nutrition_ID=m1.Nutrition_ID)";
 		ResultSet macros=null;
@@ -173,6 +178,7 @@ public class ExampleQuery {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return macros;
 	}
 
 }
