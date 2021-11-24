@@ -51,7 +51,8 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 	}
-	
+
+	// find all ingredients user has
 	private void FAIUH(String user_ID, String cnnStr) {
 		System.out.println("Looking for all ingredient User" + user_ID + " has");
 		String sql = "Select * From [Has] Where [User_ID] = " + user_ID;
@@ -81,7 +82,8 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 	}
-	
+
+	//find daily nutritional values for users
 	private void FDNFU(String user_ID, String cnnStr) {
 		System.out.println("Looking for User" + user_ID + "'s daily nutrition");
 		String sql = "Select * From [User] Where [User_ID] = " + user_ID;
@@ -96,7 +98,8 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 	}
-	
+
+	// find all ingredients in a recipe
 	private void FAIIR(String resp_Name, String cnnStr) {
 		System.out.println("Looking for all ingredient needed for " + resp_Name);
 		String sql = "Select * From [Uses] Where [Recipe_Name] = '" + resp_Name +"'";
@@ -111,7 +114,8 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 	}
-	
+
+	// find all recipes with general taste profile?
 	private void FARWGTP(String taste_Profile, String cnnStr) {
 		System.out.println("Looking for all recipe with " + taste_Profile);
 		String sql = "Select * From [Taste_Profile] Where [Taste] = '" + taste_Profile +"'";
@@ -137,7 +141,8 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 	}
-	
+
+	// find all ingredients with general taste profile and region
 	private void FARWGTP(String taste, String region, String cnnStr) {
 		System.out.println("Looking for all recipe with " + taste + " and " + region);
 		String sql = "Select * From [Taste_Profile] Where [Taste] = '" + taste +"' and [Region] = '" + region + "'";
