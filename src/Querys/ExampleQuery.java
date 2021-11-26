@@ -22,6 +22,7 @@ public class ExampleQuery {
         query.FARWGTP("America", cnnStr);
         query.FARWGTP("Salty", "America", cnnStr);
         query.FMR("Beef stew", cnnStr);
+        query.FARI("Beef",cnnStr);
     }
 	
 	private void SelectAzureSQL(String sql, String cnnStr) {
@@ -54,7 +55,7 @@ public class ExampleQuery {
 	}
 
 	// find all ingredients user has
-	private void FAIUH(String user_ID, String cnnStr) {
+	private ResultSet FAIUH(String user_ID, String cnnStr) {
 		System.out.println("Looking for all ingredient User" + user_ID + " has");
 		String sql = "Select * From [Has] Where [User_ID] = " + user_ID;
 		ResultSet resultSet = null;
@@ -67,6 +68,7 @@ public class ExampleQuery {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return resultSet;
 	}
 
 	// find nutrition of an ingredient
@@ -179,6 +181,23 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 		return macros;
+	}
+
+	// find all recipes that matches a given ingredient
+	private ResultSet FARI(String ingre_name, String cnnStr){
+		System.out.println("Finding all recipes that use "+ ingre_name );
+		String sql="SELECT u.Recipe_Name, u.Amount_Of FROM [USES] as u  WHERE u.Ingredient_Name='"+ingre_name+"'";
+		ResultSet recipes=null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			recipes = statement.executeQuery(sql);
+			while(recipes.next()) {
+				System.out.println("Name: "+ recipes.getString("Recipe_Name") +" Amount Required: "+recipes.getString("Amount_Of"));
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return recipes;
 	}
 
 }
