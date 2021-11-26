@@ -23,6 +23,7 @@ public class ExampleQuery {
         query.FARWGTP("Salty", "America", cnnStr);
         query.FMR("Beef stew", cnnStr);
         query.FARI("Beef",cnnStr);
+		query.FCM("Protien", "<", "20", cnnStr);
     }
 	
 	private void SelectAzureSQL(String sql, String cnnStr) {
@@ -166,6 +167,7 @@ public class ExampleQuery {
 		}
 		return resultSet;
 	}
+
 	// find nutrition of a recipe
 	private ResultSet FMR(String recipe_name, String cnnStr){
 		System.out.println("Looking for macros of " + recipe_name);
@@ -198,6 +200,31 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 		return recipes;
+	}
+
+	/***
+	 * finds all recipes with a certian amount of macros or more/less
+	 * sing is a string that is either > or <
+	 * macroTypre is a string that is either Proitien, Fat, or Carbs
+	 *grams is a string that is a number (20,30,40, etc)
+	 ***/
+	private ResultSet FCM(String macroType, String sign, String grams, String cnnStr){
+		String nSign="less";
+		if(sign.equals(">"))
+			nSign="more";
+		System.out.println("Finding all recipes with " + grams +" of " + macroType + " or " + nSign);
+		String sql="SELECT n.Grams_"+ macroType+ " as Macro, m.Recipe_Name as Name FROM [Macro_Contents] as m, [Nutrition] as n WHERE m.Nutrition_ID=n.Nutrition_ID and n.Grams_" + macroType + sign  +"=" + grams;
+		ResultSet macros=null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			macros = statement.executeQuery(sql);
+			while(macros.next()) {
+				System.out.println(macros.getString("Name") + " has " + macros.getString("Macro") + " grams of " + macroType);
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return macros;
 	}
 
 }
