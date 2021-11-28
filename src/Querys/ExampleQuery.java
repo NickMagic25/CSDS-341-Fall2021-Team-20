@@ -56,7 +56,7 @@ public class ExampleQuery {
 	}
 
 	// find all ingredients user has
-	private ResultSet FAIUH(String user_ID, String cnnStr) {
+	public ResultSet FAIUH(String user_ID, String cnnStr) {
 		System.out.println("Looking for all ingredient User" + user_ID + " has");
 		String sql = "Select * From [Has] Where [User_ID] = " + user_ID;
 		ResultSet resultSet = null;
@@ -73,7 +73,7 @@ public class ExampleQuery {
 	}
 
 	// find nutrition of an ingredient
-	private ResultSet FNOAI(String ingre_Name, String cnnStr) {
+	public ResultSet FNOAI(String ingre_Name, String cnnStr) {
 		System.out.println("Looking for nutrition detail for " + ingre_Name);
 		String sql = "Select * From [Nutrition] Where [Nutrition_ID] = (Select [Nutrition_ID] From [Contains] Where [Ingredient_Name] = '" + ingre_Name + "')";
 		ResultSet resultSet = null;
@@ -90,7 +90,7 @@ public class ExampleQuery {
 	}
 
 	//find daily nutritional values for users
-	private ResultSet FDNFU(String user_ID, String cnnStr) {
+	public ResultSet FDNFU(String user_ID, String cnnStr) {
 		System.out.println("Looking for User" + user_ID + "'s daily nutrition");
 		String sql = "Select * From [User] Where [User_ID] = " + user_ID;
 		ResultSet resultSet = null;
@@ -107,7 +107,7 @@ public class ExampleQuery {
 	}
 
 	// find all ingredients in a recipe
-	private ResultSet FAIIR(String resp_Name, String cnnStr) {
+	public ResultSet FAIIR(String resp_Name, String cnnStr) {
 		System.out.println("Looking for all ingredient needed for " + resp_Name);
 		String sql = "Select * From [Uses] Where [Recipe_Name] = '" + resp_Name +"'";
 		ResultSet resultSet = null;
@@ -124,7 +124,7 @@ public class ExampleQuery {
 	}
 
 	// find all recipes with general taste profile?
-	private ResultSet FARWGTP(String taste_Profile, String cnnStr) {
+	public ResultSet FARWGTP(String taste_Profile, String cnnStr) {
 		System.out.println("Looking for all recipe with " + taste_Profile);
 		String sql = "Select * From [Taste_Profile] Where [Taste] = '" + taste_Profile +"'";
 		ResultSet resultSet = null;
@@ -152,7 +152,7 @@ public class ExampleQuery {
 	}
 
 	// find all ingredients with general taste profile and region
-	private ResultSet FARWGTP(String taste, String region, String cnnStr) {
+	public ResultSet FARWGTP(String taste, String region, String cnnStr) {
 		System.out.println("Looking for all recipe with " + taste + " and " + region);
 		String sql = "Select * From [Taste_Profile] Where [Taste] = '" + taste +"' and [Region] = '" + region + "'";
 		ResultSet resultSet = null;
@@ -169,7 +169,7 @@ public class ExampleQuery {
 	}
 
 	// find nutrition of a recipe
-	private ResultSet FMR(String recipe_name, String cnnStr){
+	public ResultSet FMR(String recipe_name, String cnnStr){
 		System.out.println("Looking for macros of " + recipe_name);
 		String sql="Select n1.Grams_Protien, n1.Grams_Carbs, n1.Grams_Fat From [Nutrition] as n1, [Macro_Contents] as m1 Where (m1.Recipe_Name='"+recipe_name+"') and (n1.Nutrition_ID=m1.Nutrition_ID)";
 		ResultSet macros=null;
@@ -186,7 +186,7 @@ public class ExampleQuery {
 	}
 
 	// find all recipes that matches a given ingredient
-	private ResultSet FARI(String ingre_name, String cnnStr){
+	public ResultSet FARI(String ingre_name, String cnnStr){
 		System.out.println("Finding all recipes that use "+ ingre_name );
 		String sql="SELECT u.Recipe_Name, u.Amount_Of FROM [USES] as u  WHERE u.Ingredient_Name='"+ingre_name+"'";
 		ResultSet recipes=null;
@@ -208,7 +208,7 @@ public class ExampleQuery {
 	 * macroTypre is a string that is either Proitien, Fat, or Carbs
 	 *grams is a string that is a number (20,30,40, etc)
 	 ***/
-	private ResultSet FCM(String macroType, String sign, String grams, String cnnStr){
+	public ResultSet FCM(String macroType, String sign, String grams, String cnnStr){
 		String nSign="less";
 		if(sign.equals(">"))
 			nSign="more";
@@ -225,6 +225,23 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 		return macros;
+	}
+
+	public ResultSet FAR(String user_ID,String cnnStr){
+		System.out.println("Finding all recipes you can make");
+		String sql="SELECT u.Recipe_Name FROM [Uses] as u  WHERE u.Amount_of <= all (Select h.Serving_Size as Amount_Of From [Has] as h WHERE h.User_Id="+ user_ID+ " )";
+		ResultSet ans=null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			ans = statement.executeQuery(sql);
+			while(ans.next()) {
+				System.out.println("You can make "+ ans.getString("Recipe_Name"));
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return ans;
+
 	}
 
 }
