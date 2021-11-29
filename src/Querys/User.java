@@ -30,12 +30,11 @@ public class User{
         String r_name=scanner.nextLine();
         if(database.recipeExists(r_name,cnnStr))
             database.ate(id,r_name,cnnStr);
-        else
-        {
+        else {
             System.out.println("Recipe does not exists in database");
-            System.out.println("Adding "+ r_name+ " to the database");
-            addRecipeHandler(database,r_name,cnnStr);
-            ateHandler(database,r_name,cnnStr);
+            System.out.println("Adding " + r_name + " to the database");
+            addRecipeHandler(database, r_name, cnnStr);
+            database.ate(id,r_name,cnnStr);
         }
     }
     /**
