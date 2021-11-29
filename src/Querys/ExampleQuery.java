@@ -13,7 +13,7 @@ public class ExampleQuery {
         
         ExampleQuery query = new ExampleQuery();
         System.out.println("connecting");
-		query.findJornal("1", cnnStr);
+		query.addIngredientToPantry("1", "Brown Rice", "10",cnnStr);
         //System.out.println(query.recipeExists("Beef stew", cnnStr));
         
         //System.out.println(query.FIE("alsdkjhfa", cnnStr));
@@ -243,7 +243,7 @@ public class ExampleQuery {
 	 */
 	private boolean FIE(String Name, String cnnStr) {
 		System.out.println("Finding " + Name);
-		String sql= "Select * From [Ingredient] Where [Name] = '" + Name + "'";
+		String sql= "Select [Name] From [Ingredient] Where [Name] = '" + Name + "'";
 		ResultSet resultSet = null;
 		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
 			resultSet = statement.executeQuery(sql);
@@ -537,5 +537,54 @@ public class ExampleQuery {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	// adds an ingredient to a user's pantry
+	public void addIngredientToPantry(String user_ID, String ingre_name,String amount ,String cnnStr)
+	{
+		if(!FIE(ingre_name, cnnStr))
+		{
+			AI(ingre_name,cnnStr);
+		}
+		if(notInPantry(user_ID,ingre_name,cnnStr))
+			addIngredient(user_ID,ingre_name,amount,cnnStr);
+		else
+		{
+			String sql="Update [Has] Set Serving_Size=Serving_Size+"+ amount + "WHERE User_ID="+ user_ID + "and Name='"+ ingre_name +"'";
+			try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+				ResultSet resultSet = null;
+				statement.execute();
+				System.out.println("Ingredient added!");
+			}
+			catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void addIngredient(String user_ID, String ingre_name,String amount ,String cnnStr){
+		String sql="Insert [Has](User_ID, Name, Serving_Size) Values("+ user_ID + ",'" + ingre_name + "'," + amount + ")";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			System.out.println("Ingredient added!");
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean notInPantry(String user_ID, String ingre_name, String cnnStr)
+	{
+		String sql="SELECT Name FROM [Has]  WHERE User_Id="+ user_ID +"and Name='"+ ingre_name +"'";
+		ResultSet resultSet = null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			resultSet = statement.executeQuery(sql);
+			return !resultSet.next(); // true if not found, false if in database
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return true;
 	}
 }

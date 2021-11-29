@@ -50,75 +50,70 @@ public class User{
         String cnnStr="jdbc:sqlserver://arnold-tracker.database.windows.net:1433;database=arnold-tracker;user=team20@arnold-tracker;password={ArnOld2021$};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
         ExampleQuery database=new ExampleQuery();
 
-        int size=args.length;
-
-        if(query.equals("FAIUH"))
+        // find all ingredients a user has
+        if(query.equals("My-Pantry"))
             database.FAIUH(id,cnnStr);
-        if(query.equals("FNOAI")){
+        // finds nutrition of an ingredient
+        if(query.equals("Find-Ingredient-Macros")){
             String ingreName=args[2];
             database.FNOAI(ingreName,cnnStr);
         }
-        if(query.equals("FDNFU"))
+        // finds daily nutritional value for a user
+        if(query.equals("Find-My-Macros"))
             database.FDNFU(id,cnnStr);
-        if(query.equals("FAIIR")){
-            String respName=args[2];
-            database.FAIIR(respName,cnnStr);
+        // finds all ingredients in a recipe
+        if(query.equals("Find-Ingredients-OF")){
+            String r_Name=args[2];
+            database.FAIIR(r_Name,cnnStr);
         }
-        if(query.equals("FARWGTP") && size==3){
+        // finds all recipes with the same taste profile
+        if(query.equals("Find-Taste")){
             String taste=args[2];
             database.FAIIR(taste,cnnStr);
         }
-        if(query.equals("FARWGTP")){
+        // finds all recipes with the same taste profile and from the same region
+        if(query.equals("Find-Taste-And-Region")){
             String taste=args[2];
             String region=args[3];
             database.FARWGTP(taste,region,cnnStr);
         }
-        if(query.equals("FMR")){
+        // finds the nutrition of a recipe
+        if(query.equals("Find-Nutrition-Of")){
             String name=args[2];
             database.FMR(name,cnnStr);
         }
-        if(query.equals("FARI")){
+        // finds all recipes that match a given ingredient
+        if(query.equals("Find-All-Recipes-With")){
             String ingreName=args[2];
             database.FARI(ingreName,cnnStr);
         }
-        if(query.equals("FCM")){
+        // finds all recipes are over/under a given macro
+        if(query.equals("Find-Recipe-Restraint")){
             String macroType=args[2];
             String sign=args[3];
             String grams=args[4];
             database.FCM(macroType,sign,grams,cnnStr);
         }
-        if(query.equals("FAR"))
+        // finds all recipes that a user can make
+        if(query.equals("Find-All-Recipes"))
             database.FAR(id,cnnStr);
-        if(query.equals("AI")){
+        // adds and incredient to the database
+        if(query.equals("Add-Ingredient")){
             String name=args[2];
-            database.AI(name,cnnStr);
+            String amount=args [3];
+            database.addIngredientToPantry(id, name, amount,cnnStr);
         }
-        if(query.equals("ATP")){
-            String taste=args[2];
-            String r_name=args[3];
-            database.ATP(taste,r_name,cnnStr);
-        }
-        if(query.equals("AHT")){
-            String taste=args[2];
-            String r_name=args[3];
-            database.AHT(taste,r_name,cnnStr);
-        }
-        if(query.equals("AMC")){
-            String r_name=args[2];
-            String N_ID=args[3];
-            database.AMC(r_name,N_ID,cnnStr);
-        }
-        if(query.equals("AU")){
-            String I_Name=args[2];
-            String R_Name=args[3];
-            database.AU(I_Name,R_Name,cnnStr);
-        }
-        if(query.equals("AR")){
+        // adds a recipe to the database
+        if(query.equals("Add-Recipe")){
             String r_name=args[2];
             addRecipeHandler(database,r_name, cnnStr);
         }
-        if(query.equals("ATE")){
+        // tracks what a user ate
+        if(query.equals("Ate")){
             ateHandler(database,id,cnnStr);
         }
+        //finds what a user ate
+        if(query.equals("Journal"))
+            database.findJornal(id,cnnStr);
     }
 }

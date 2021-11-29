@@ -1,0 +1,42 @@
+Requirements: Have Java 11 installed on your computer
+Currently supproted in terminal use
+
+if you are having issues it's probably cause azure doesn't recognize your IP,
+just message me if you would like it fixed
+
+How to use:
+Go to the bin folder in order to access the package. The following is how to access certain commands:
+    Make a new user: type "java Querys.AddUser" into the terminal. this will generate your unique User Id you will need to
+                     use for all other functions
+
+
+For the remaining functionality the User class is used. Please use the following commands after "java Querys.User [your user id]"
+to access the remaining functionality
+
+"My Pantry": shows what ingredients are in your pantry
+
+"Find-Ingredient-Macros [ingredient name]": shows the macro contents of the ingredient if it exists
+
+"Find-My-Macros": shows your daily macro values
+
+"Find-Ingredients-Of [recipe name]": shows the ingredients of the recipe
+
+"Find-Taste [taste]": Finds recipes with a given taste
+
+"Find-Taste-And-Region [taste] [region]": Finds recipes with given taste from given region
+
+"Find-Nutrition-Of [recipe name]": finds the nutrition of a recipe
+
+"Find-All-Recipes-With [ingredient name]": finds all recipes that use the given ingredient
+
+"Find-Recipe-Restraint [Protien, Carbs, Or Fat] [> or <] [1,2,3,4..etc]": finds a recipe with more or less grams of a given macro
+
+"Find-All-Recipes": Finds all recipes you can make from your pantry
+
+"Add-Ingredient [Ingredient name] [1,2,3,4,..etc]": adds the ingredient to your pantry with a given serving size
+
+"Add-Recipe [recipe name]": adds the recipe to the database
+
+"Ate": tracks what you ate
+
+"Journal": Finds all food you ate
