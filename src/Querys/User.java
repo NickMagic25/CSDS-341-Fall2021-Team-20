@@ -3,8 +3,14 @@ import java.util.Scanner;
 
 public class User{
 
+    //handles adding a recipe
     private static void addRecipeHandler(ExampleQuery database, String r_name,String cnnStr){
-        System.out.println("Type the instrucitons");
+        if(database.recipeExists(r_name,cnnStr))
+        {
+            System.out.print(r_name + " already exists in database");
+            return;
+        }
+        System.out.println("Type the instructions");
         Scanner scanner=new Scanner(System.in);
         String instructions=scanner.nextLine();
         System.out.println("Whats the difficulty from 1-10?");
@@ -16,6 +22,22 @@ public class User{
         database.AR(r_name,instructions,diff,taste,ingredients,cnnStr);
     }
 
+    //handles eating a recipe
+    private static void ateHandler(ExampleQuery database, String id, String cnnStr)
+    {
+        Scanner scanner=new Scanner(System.in);
+        System.out.println("What is the name of the recipe you ate");
+        String r_name=scanner.nextLine();
+        if(database.recipeExists(r_name,cnnStr))
+            database.ate(id,r_name,cnnStr);
+        else
+        {
+            System.out.println("Recipe does not exists in database");
+            System.out.println("Adding "+ r_name+ " to the database");
+            addRecipeHandler(database,r_name,cnnStr);
+            ateHandler(database,r_name,cnnStr);
+        }
+    }
     /**
      * Requirements:
      * args[0] is the user id
@@ -95,6 +117,9 @@ public class User{
         if(query.equals("AR")){
             String r_name=args[2];
             addRecipeHandler(database,r_name, cnnStr);
+        }
+        if(query.equals("ATE")){
+            ateHandler(database,id,cnnStr);
         }
     }
 }

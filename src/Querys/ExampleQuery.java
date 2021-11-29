@@ -13,9 +13,10 @@ public class ExampleQuery {
         
         ExampleQuery query = new ExampleQuery();
         System.out.println("connecting");
-        query.newNutrition("10","10","10",cnnStr);
+		query.findJornal("1", cnnStr);
+        //System.out.println(query.recipeExists("Beef stew", cnnStr));
         
-        System.out.println(query.FIE("alsdkjhfa", cnnStr));
+        //System.out.println(query.FIE("alsdkjhfa", cnnStr));
     }
 	
 	private void SelectAzureSQL(String sql, String cnnStr) {
@@ -219,6 +220,7 @@ public class ExampleQuery {
 		return macros;
 	}
 
+	// finds all recipes a user can make
 	public ResultSet FAR(String user_ID,String cnnStr){
 		System.out.println("Finding all recipes you can make");
 		String sql="SELECT u.Recipe_Name FROM [Uses] as u  WHERE u.Amount_of <= all (Select h.Serving_Size as Amount_Of From [Has] as h WHERE h.User_Id="+ user_ID+ " )";
@@ -492,6 +494,47 @@ public class ExampleQuery {
 			System.out.println("Nutrition ID: " + realID);
 		}
 		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void ate(String user_id, String r_name, String cnnStr){
+		System.out.println("User " + user_id + " ate " + r_name);
+		String sql="Insert into [Ate](User_ID, Recipe_Name, Nutrition_ID) Values(" + user_id + "," + r_name + ", -1)";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			System.out.println("Successfully recorded!");
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public boolean recipeExists(String r_name, String cnnStr){
+		String sql= "Select Name FROM [Recipe] WHERE Name='" + r_name + "'";
+		ResultSet resultSet = null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			resultSet = statement.executeQuery(sql);
+			return resultSet.next(); // true if found, false if not in database
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public void findJornal(String user_id, String cnnStr){
+		System.out.println("Finding what user " + user_id +" ate");
+		String sql="Select Recipe_Name From [Ate] Where User_Id=" + user_id;
+		ResultSet ans=null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			ans = statement.executeQuery(sql);
+			while(ans.next()) {
+				System.out.println("Ate "+ ans.getString("Recipe_Name"));
+			}
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
