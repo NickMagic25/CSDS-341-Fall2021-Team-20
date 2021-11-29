@@ -14,16 +14,7 @@ public class ExampleQuery {
         System.out.println("connecting");
         
         
-        String sql = "Select * From [Has] Where [User_ID] = 1";
-        query.FAIUH("1", cnnStr);
-        query.FNOAI("Carrot", cnnStr);
-        query.FDNFU("1", cnnStr);
-        query.FAIIR("Beef stew", cnnStr);
-        query.FARWGTP("America", cnnStr);
-        query.FARWGTP("Salty", "America", cnnStr);
-        query.FMR("Beef stew", cnnStr);
-        query.FARI("Beef",cnnStr);
-		query.FCM("Protien", "<", "20", cnnStr);
+        System.out.println(query.FIE("alsdkjhfa", cnnStr));
     }
 	
 	private void SelectAzureSQL(String sql, String cnnStr) {
@@ -151,7 +142,7 @@ public class ExampleQuery {
 		return resultSet;
 	}
 
-	// find all ingredients with general taste profile and region
+	// find all recipe with general taste profile and region
 	public ResultSet FARWGTP(String taste, String region, String cnnStr) {
 		System.out.println("Looking for all recipe with " + taste + " and " + region);
 		String sql = "Select * From [Taste_Profile] Where [Taste] = '" + taste +"' and [Region] = '" + region + "'";
@@ -241,7 +232,190 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 		return ans;
-
 	}
-
+	
+	/***
+	 * Traverse through the database and see if the given ingredient exists
+	 * @return true if exists, false if not
+	 */
+	public boolean FIE(String Name, String cnnStr) {
+		System.out.println("Finding " + Name);
+		String sql= "Select * From [Ingredient] Where [Name] = '" + Name + "'";
+		ResultSet resultSet = null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			resultSet = statement.executeQuery(sql);
+			if(resultSet.next())
+				return true;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/***
+	 * Add ingredient into database
+	 * @param Name
+	 * @param cnnStr
+	 */
+	public void AI(String Name, String cnnStr) {
+		System.out.println("Adding ingredient into database");
+		String sql = "Insert into [Ingredient]([Name], [Food_type], [Nutrition_ID]) Values('" + Name+ "', 'unknown', -1)";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			resultSet = statement.getGeneratedKeys();
+			while(resultSet.next()) {
+				System.out.println("key: " + resultSet.getString(1));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/***
+	 * Find a Taste_Profile exist or not
+	 * @param Name
+	 * @param cnnStr
+	 * @return
+	 */
+	public boolean FTP(String Name, String cnnStr) {
+		System.out.println("Finding " + Name);
+		ResultSet resultSet = FARWGTP(Name, cnnStr);
+		try{
+			if(!resultSet.wasNull())
+				return true;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/***
+	 * Add Taste_Profile
+	 * @param Name
+	 * @param cnnStr
+	 */
+	public void ATP(String Taste, String R_Name, String cnnStr) {
+		System.out.println("Adding Taste_Profile into database");
+		String sql = "Insert into [Taste_Profile]([R_Name], [Taste], [Region], [Dietary_Rest]) Values('" + R_Name+ "', '" + Taste + "', 'Unknown', 'no')";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			resultSet = statement.getGeneratedKeys();
+			while(resultSet.next()) {
+				System.out.println("key: " + resultSet.getString(1));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/***
+	 * Add data into Has_Taste
+	 * @param Taste
+	 * @param R_Name
+	 */
+	public void AHT(String Taste, String R_Name, String cnnStr) {
+		System.out.println("Adding Has_Taste into database");
+		String sql = "Insert into [Has_Taste]([Taste], [R_Name], [Name]) Values('" + Taste + "', '" + R_Name + "', '+" + R_Name + "', 'no')";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			resultSet = statement.getGeneratedKeys();
+			while(resultSet.next()) {
+				System.out.println("key: " + resultSet.getString(1));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/***
+	 * Add Macro_Contents into database
+	 * @param R_Name
+	 * @param N_ID
+	 */
+	public void AMC(String R_Name, String N_ID, String cnnStr) {
+		System.out.println("Adding Macro_Contents into database");
+		String sql = "Insert into [Macro_Contents]([Recipe_Name], [Nutrition_ID]) Values('" + R_Name + "', " + N_ID + ")";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			resultSet = statement.getGeneratedKeys();
+			while(resultSet.next()) {
+				System.out.println("key: " + resultSet.getString(1));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/***
+	 * Add Uses into databases
+	 * @param I_Name
+	 * @param R_Name
+	 * @param cnnStr
+	 */
+	public void AU(String I_Name, String R_Name, String cnnStr) {
+		System.out.println("Adding Uses into database");
+		String sql = "Insert into [Uses]([Ingredient_Name], [Recipee_Name], [Amount_Of]) Values('" + I_Name + "', '" + R_Name + "', 1)";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			resultSet = statement.getGeneratedKeys();
+			while(resultSet.next()) {
+				System.out.println("key: " + resultSet.getString(1));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/***
+	 * adding recipe
+	 */
+	public void AR(String Name, String instructions, String Diff, String Taste, String Ingredients, String cnnStr){
+		System.out.println("Adding recipe " + Name + "into the database");
+		String[] Ingredient = Ingredients.split(" ");
+		Boolean[] exist = new Boolean[Ingredient.length];
+		for(Boolean e : exist)
+			e = true;
+		for(int i = 0; i < Ingredient.length; i++){
+			if(!FIE(Ingredient[i], cnnStr))
+				exist[i] = false;
+		}
+		for(int i = 0; i < exist.length; i++) {
+			if(!exist[i])
+				AI(Ingredient[i], cnnStr);
+		}
+		if(!FTP(Taste, cnnStr)) {
+			ATP(Taste, Name, cnnStr);
+		}
+		String sql = "Insert into [Recipe]([Name], [Instructions], [Diffculty_Level], [Nutrition_ID], [Taste_Profile]) "
+				+ "Values('"+ Name +"', '" + instructions + "', " + Diff + ", -1, '" + Taste + "')";
+		try(Connection cnn = DriverManager.getConnection(cnnStr);
+			PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+				ResultSet resultSet = null;
+				statement.execute();
+				resultSet = statement.getGeneratedKeys();
+				while(resultSet.next()) {
+					System.out.println("key: " + resultSet.getString(1));
+				}
+			}
+			catch(SQLException e) {
+				e.printStackTrace();
+			}
+		AHT(Taste, Name, cnnStr);
+		AMC(Name, "-1", cnnStr);
+		for(String i: Ingredient) {
+			AU(i, Name, cnnStr);
+		}
+	}
 }
