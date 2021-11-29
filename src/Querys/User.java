@@ -1,6 +1,21 @@
 package Querys;
+import java.util.Scanner;
 
 public class User{
+
+    private static void addRecipeHandler(ExampleQuery database, String r_name,String cnnStr){
+        System.out.println("Type the instrucitons");
+        Scanner scanner=new Scanner(System.in);
+        String instructions=scanner.nextLine();
+        System.out.println("Whats the difficulty from 1-10?");
+        String diff= scanner.nextLine();
+        System.out.println("What is the taste of the recipe?");
+        String taste= scanner.nextLine();
+        System.out.println("What are the ingredients in the recipe (seperate them with a comma)");
+        String ingredients= scanner.nextLine();
+        database.AR(r_name,instructions,diff,taste,ingredients,cnnStr);
+    }
+
     /**
      * Requirements:
      * args[0] is the user id
@@ -53,5 +68,33 @@ public class User{
         }
         if(query.equals("FAR"))
             database.FAR(id,cnnStr);
+        if(query.equals("AI")){
+            String name=args[2];
+            database.AI(name,cnnStr);
+        }
+        if(query.equals("ATP")){
+            String taste=args[2];
+            String r_name=args[3];
+            database.ATP(taste,r_name,cnnStr);
+        }
+        if(query.equals("AHT")){
+            String taste=args[2];
+            String r_name=args[3];
+            database.AHT(taste,r_name,cnnStr);
+        }
+        if(query.equals("AMC")){
+            String r_name=args[2];
+            String N_ID=args[3];
+            database.AMC(r_name,N_ID,cnnStr);
+        }
+        if(query.equals("AU")){
+            String I_Name=args[2];
+            String R_Name=args[3];
+            database.AU(I_Name,R_Name,cnnStr);
+        }
+        if(query.equals("AR")){
+            String r_name=args[2];
+            addRecipeHandler(database,r_name, cnnStr);
+        }
     }
 }
