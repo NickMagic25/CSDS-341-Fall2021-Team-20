@@ -1,6 +1,7 @@
 package Querys;
 
 import java.sql.*;
+import java.util.Random;
 
 public class ExampleQuery {
 	public static void main(String[] args) {
@@ -12,7 +13,7 @@ public class ExampleQuery {
         
         ExampleQuery query = new ExampleQuery();
         System.out.println("connecting");
-        
+        query.newNutrition("10","10","10",cnnStr);
         
         System.out.println(query.FIE("alsdkjhfa", cnnStr));
     }
@@ -195,7 +196,7 @@ public class ExampleQuery {
 
 	/***
 	 * finds all recipes with a certian amount of macros or more/less
-	 * sing is a string that is either > or <
+	 * sign is a string that is either > or <
 	 * macroTypre is a string that is either Proitien, Fat, or Carbs
 	 *grams is a string that is a number (20,30,40, etc)
 	 ***/
@@ -238,7 +239,7 @@ public class ExampleQuery {
 	 * Traverse through the database and see if the given ingredient exists
 	 * @return true if exists, false if not
 	 */
-	public boolean FIE(String Name, String cnnStr) {
+	private boolean FIE(String Name, String cnnStr) {
 		System.out.println("Finding " + Name);
 		String sql= "Select * From [Ingredient] Where [Name] = '" + Name + "'";
 		ResultSet resultSet = null;
@@ -280,7 +281,7 @@ public class ExampleQuery {
 	 * @param cnnStr
 	 * @return
 	 */
-	public boolean FTP(String Name, String cnnStr) {
+	private boolean FTP(String Name, String cnnStr) {
 		System.out.println("Finding " + Name);
 		ResultSet resultSet = FARWGTP(Name, cnnStr);
 		try{
@@ -295,8 +296,6 @@ public class ExampleQuery {
 	
 	/***
 	 * Add Taste_Profile
-	 * @param Name
-	 * @param cnnStr
 	 */
 	public void ATP(String Taste, String R_Name, String cnnStr) {
 		System.out.println("Adding Taste_Profile into database");
@@ -383,7 +382,7 @@ public class ExampleQuery {
 	 */
 	public void AR(String Name, String instructions, String Diff, String Taste, String Ingredients, String cnnStr){
 		System.out.println("Adding recipe " + Name + "into the database");
-		String[] Ingredient = Ingredients.split(" ");
+		String[] Ingredient = Ingredients.split(",");
 		Boolean[] exist = new Boolean[Ingredient.length];
 		for(Boolean e : exist)
 			e = true;
@@ -416,6 +415,84 @@ public class ExampleQuery {
 		AMC(Name, "-1", cnnStr);
 		for(String i: Ingredient) {
 			AU(i, Name, cnnStr);
+		}
+	}
+
+	// Creates a new user
+	public  static void newUser(String gProtien,String gCarbs, String gFat, String cnnStr)
+	{
+		System.out.println("Making new user...");
+		int possibleID=findRandNum();
+		while(userFound(String.valueOf(possibleID),cnnStr))
+		{
+			possibleID=findRandNum();
+		}
+		String realID=String.valueOf(possibleID);
+		String sql="Insert into [User]([user_id], [daily_protien], [daily_carbs], [daily_fat]) Values(" + realID + ", "+ gProtien + ", "+ gCarbs +", " + gFat + ")";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			System.out.println("New user created!");
+			System.out.println("User ID: " + realID);
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	// returns true if the user id already exists
+	public static boolean userFound(String ID, String cnnStr)
+	{
+		String sql="SELECT user_id  FROM [User] WHERE user_id="+ID;
+		ResultSet resultSet = null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			resultSet = statement.executeQuery(sql);
+			return resultSet.next(); // true if found, false if not in database
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private static int findRandNum()
+	{
+		Random rand=new Random();
+		return rand.nextInt(2147483647);
+	}
+
+	// returns true if the nutrition id is found
+	public boolean nutritionIDFound(String ID, String cnnStr){
+		String sql="SELECT Nutrition_ID FROM [Nutrition] WHERE Nutrition_ID=" + ID;
+		ResultSet resultSet = null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			resultSet = statement.executeQuery(sql);
+			return resultSet.next(); // true if found, false if not in database
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public void newNutrition(String gProtien, String gCarbs, String gFat,String cnnStr) {
+		System.out.println("Creating new nutrition information");
+		int possibleId = findRandNum();
+		while (nutritionIDFound(String.valueOf(possibleId), cnnStr)) {
+			possibleId = findRandNum();
+		}
+		String realID = String.valueOf(possibleId);
+		String sql = "Insert into [Nutrition]([Nutrition_ID], [Grams_Protien], [Grams_Carbs], [Grams_Fat])" +
+				"Values("+ realID + ","+gProtien+ "," + gCarbs + "," + gFat + ")";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			System.out.println("Nutrition information created!");
+			System.out.println("Nutrition ID: " + realID);
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
 		}
 	}
 }
