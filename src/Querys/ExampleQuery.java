@@ -587,4 +587,17 @@ public class ExampleQuery {
 
 		return true;
 	}
+
+	public void FI(String r_name, String cnnStr){
+		System.out.println("Finding instructions for " + r_name);
+		String sql="Select instructions FROM [Recipe] WHERE Name='" + r_name +"'";
+		ResultSet ans=null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			ans = statement.executeQuery(sql);
+			while(ans.next()) {
+				System.out.println("Here's how to make " + r_name);
+				System.out.println(ans.getString("instructions"));
+			}
+		}
+	}
 }
