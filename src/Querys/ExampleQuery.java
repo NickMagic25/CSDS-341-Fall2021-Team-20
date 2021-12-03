@@ -242,14 +242,13 @@ public class ExampleQuery {
 	 * Traverse through the database and see if the given ingredient exists
 	 * @return true if exists, false if not
 	 */
-	private boolean FIE(String Name, String cnnStr) {
+	public boolean FIE(String Name, String cnnStr) {
 		System.out.println("Finding " + Name);
 		String sql= "Select [Name] From [Ingredient] Where [Name] = '" + Name.toLowerCase() + "'";
 		ResultSet resultSet = null;
 		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
 			resultSet = statement.executeQuery(sql);
-			if(resultSet.next())
-				return true;
+			return resultSet.next(); //true if exists, false if not
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -263,14 +262,14 @@ public class ExampleQuery {
 	 * @param cnnStr
 	 */
 	public void AI(String Name, String cnnStr) {
-		System.out.println("Adding ingredient into database");
+		System.out.println("Adding "+ Name +" into database");
 		String sql = "Insert into [Ingredient]([Name], [Food_type], [Nutrition_ID]) Values('" + Name.toLowerCase()+ "', 'unknown', -1)";
 		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
 			ResultSet resultSet = null;
 			statement.execute();
 			resultSet = statement.getGeneratedKeys();
-			while(resultSet.next()) {
-				System.out.println("key: " + resultSet.getString(1));
+			if(resultSet.next()) {
+				System.out.println("Added to database!");
 			}
 		}
 		catch(SQLException e) {
@@ -323,7 +322,7 @@ public class ExampleQuery {
 	 */
 	public void AHT(String Taste, String R_Name, String cnnStr) {
 		System.out.println("Adding Has_Taste into database");
-		String sql = "Insert into [Has_Taste]([Taste], [R_Name], [Name]) Values('" + Taste.toLowerCase() + "', '" + R_Name.toLowerCase() + "', '+" + R_Name.toLowerCase() + "', 'no')";
+		String sql = "Insert into [Has_Taste]([Taste], [R_Name], [Name]) Values('" + Taste.toLowerCase() + "', '" + R_Name.toLowerCase() + "', '+" + R_Name.toLowerCase() + "')";
 		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
 			ResultSet resultSet = null;
 			statement.execute();
@@ -366,7 +365,7 @@ public class ExampleQuery {
 	 */
 	public void AU(String I_Name, String R_Name, String cnnStr) {
 		System.out.println("Adding Uses into database");
-		String sql = "Insert into [Uses]([Ingredient_Name], [Recipee_Name], [Amount_Of]) Values('" + I_Name.toLowerCase() + "', '" + R_Name.toLowerCase() + "', 1)";
+		String sql = "Insert into [Uses]([Ingredient_Name], [Recipe_Name], [Amount_Of]) Values('" + I_Name.toLowerCase() + "', '" + R_Name.toLowerCase() + "', 1)";
 		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
 			ResultSet resultSet = null;
 			statement.execute();
@@ -379,11 +378,16 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/***
 	 * adding recipe
 	 */
 	public void AR(String Name, String instructions, String Diff, String Taste, String Ingredients, String cnnStr){
+		if(recipeExists(Name, cnnStr))
+		{
+			System.out.println(Name+ " already exists");
+			return;
+		}
 		System.out.println("Adding recipe " + Name.toLowerCase() + "into the database");
 		String[] Ingredient = Ingredients.split(",");
 		Boolean[] exist = new Boolean[Ingredient.length];
@@ -394,7 +398,7 @@ public class ExampleQuery {
 				exist[i] = false;
 		}
 		for(int i = 0; i < exist.length; i++) {
-			if(!exist[i])
+			if(exist[i]!=null && !exist[i])
 				AI(Ingredient[i], cnnStr);
 		}
 		if(!FTP(Taste, cnnStr)) {
@@ -422,7 +426,7 @@ public class ExampleQuery {
 	}
 
 	// Creates a new user
-	public  static void newUser(String gProtien,String gCarbs, String gFat, String cnnStr)
+	public String newUser(String gProtien,String gCarbs, String gFat, String cnnStr)
 	{
 		System.out.println("Making new user...");
 		int possibleID=findRandNum();
@@ -442,6 +446,7 @@ public class ExampleQuery {
 			e.printStackTrace();
 		}
 
+		return realID;
 	}
 
 	// returns true if the user id already exists
@@ -479,7 +484,8 @@ public class ExampleQuery {
 		return false;
 	}
 
-	public void newNutrition(String gProtien, String gCarbs, String gFat,String cnnStr) {
+	//creates a new nutrition ID and returns the new ID
+	public String newNutrition(String gProtien, String gCarbs, String gFat,String cnnStr) {
 		System.out.println("Creating new nutrition information");
 		int possibleId = findRandNum();
 		while (nutritionIDFound(String.valueOf(possibleId), cnnStr)) {
@@ -497,6 +503,7 @@ public class ExampleQuery {
 		catch(SQLException e) {
 			e.printStackTrace();
 		}
+		return realID;
 	}
 
 	public void ate(String user_id, String r_name, String cnnStr){
@@ -562,6 +569,7 @@ public class ExampleQuery {
 		}
 	}
 
+	//adds an existing ingredient into a users pantry
 	private void addIngredient(String user_ID, String ingre_name,String amount ,String cnnStr){
 		String sql="Insert [Has](User_ID, Name, Serving_Size) Values("+ user_ID + ",'" + ingre_name.toLowerCase() + "'," + amount + ")";
 		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
@@ -574,6 +582,7 @@ public class ExampleQuery {
 		}
 	}
 
+	// checks to see if an ingredient is already in a users pantry returns true if it is
 	private boolean notInPantry(String user_ID, String ingre_name, String cnnStr)
 	{
 		String sql="SELECT Name FROM [Has]  WHERE User_Id="+ user_ID +"and Name='"+ ingre_name.toLowerCase() +"'";
@@ -603,5 +612,23 @@ public class ExampleQuery {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	//updates the nutrition ID of an ingredient
+	public void updateNutritionIDIngre(String name, String newID, String cnnStr){
+		String sql= "Update [Ingredient] Set Nutrition_ID=" + newID + " WHERE Name='"+ name + "'";
+		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
+			ResultSet resultSet = null;
+			statement.execute();
+			System.out.println("Ingredient added!");
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void updateNutritionRecipe(String name, String newID, String cnnStr)
+	{
+
 	}
 }

@@ -17,7 +17,7 @@ public class User{
         String diff= scanner.nextLine();
         System.out.println("What is the taste of the recipe?");
         String taste= scanner.nextLine();
-        System.out.println("What are the ingredients in the recipe (seperate them with a comma)");
+        System.out.println("What are the ingredients in the recipe (seperate them with a comma with no spaces between ingredient names and commas)");
         String ingredients= scanner.nextLine();
         database.AR(r_name,instructions,diff,taste,ingredients,cnnStr);
     }
