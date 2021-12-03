@@ -17,7 +17,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/bin/dependencies/mssql-jdbc-9.4.0.jre11.jar!/" />
+          <root url="jar://$MODULE_DIR$/dependencies/mssql-jdbc-9.4.0.jre11.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

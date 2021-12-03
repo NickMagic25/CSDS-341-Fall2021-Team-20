@@ -1,17 +1,14 @@
 package Querys;
 import javax.xml.transform.Result;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.Buffer;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Random;
 import java.sql.*;
-import java.io.FileWriter;
 
 
 public class TestingClass {
@@ -67,18 +64,29 @@ public class TestingClass {
         return null;
     }
 
+    private static void writeToFile(BufferedWriter wr, String line)
+    {
+        try
+        {
+            wr.append(line);
+        } catch (IOException e) {
+            System.out.println("Could not write to file");
+            e.printStackTrace();
+        }
+    }
+
     // takes in some common ingredients from a txt file and then 2000 random ingredients
     // updates the nutrition ID for them as well with random vals
-    private static List<String> addIngredients(){
+    private static List<String> addIngredients()
+    {
         List<String> ingredients=new ArrayList<>();
         File file= new File(System.getProperty("user.dir")+"/src/Querys/Text Files/ingredients");
-        for(int i=0;i<=2000;i++){
-            ingredients.add("test ingredient " + i);
+        for(int i=0;i<=4000;i++){
+            ingredients.add("test ingredient " + findRandNum());
         }
         try
         {
             fileToList(ingredients, new Scanner(file));
-            /***
             for(String name:ingredients)
             {
                 if(!database.FIE(name,cnnStr))
@@ -91,12 +99,11 @@ public class TestingClass {
                 String c= String.valueOf(findRandNum());
                 String f= String.valueOf(findRandNum());
                 //generate a new nutrition ID
-                //String nID=database.newNutrition(p,c,f,cnnStr);
+                String nID=database.newNutrition(p,c,f,cnnStr);
                 //update the ingredient's nutrition id
-                //database.updateNutritionIDIngre(name,nID,cnnStr);
+                database.updateNutritionIDIngre(name,nID,cnnStr);
                 System.out.println("Updated nutrition ID for " + name);
             }
-            ***/
         }
         catch (FileNotFoundException e) {
             System.out.println(System.getProperty("user.dir"));
@@ -105,18 +112,20 @@ public class TestingClass {
     }
 
     // makes 2000 random recipes, at least one user can make any given recipes
-    private  static void randomRecipes(List<String> ingre, List<String> ids){
+    private  static void randomRecipes(List<String> ingre, List<String> ids)
+    {
         int len=ingre.size()-1;
         int i=20;
-        while(i<=2000)
+        while(i<=3000)
         {
+            //has 20 ingredients max
             int r_size = findRandNum(20);
             int[] index = findRandIndex(r_size, len);
             String ingredients=ingre.get(index[0]);
             for(int j=1;j< index.length;j++)
                 ingredients+="," + ingre.get(index[j]);
             //System.out.println("Adding a recipe with ingredients: " + ingredients);
-            database.AR("test recipe" + i,"Do the thing with the other thing and boom food", "2", "unknown", ingredients, cnnStr );
+            database.AR("test recipe" + findRandNum(),"Do the thing with the other thing and boom food", "2", "unknown", ingredients, cnnStr );
             String[] pantry= ingredients.split(",");
             String randId=ids.get(findRandNum(ids.size()-1));
             for(String name:pantry)
@@ -141,7 +150,8 @@ public class TestingClass {
         return ids;
     }
 
-    private static void findWhatEveryoneCanMake(List<String> ids){
+    private static void findWhatEveryoneCanMake(List<String> ids)
+    {
         try
         {
             File log=makeFile();
@@ -153,6 +163,7 @@ public class TestingClass {
                     line+= ans.getString("Recipe_Name") +"\n";
                 line+="\n \n \n \n";
                 wr.write(line);
+                wr.flush();
             }
             wr.close();
         }
@@ -173,6 +184,7 @@ public class TestingClass {
         List<String> ingre=addIngredients();
         //make random recipes
         randomRecipes(ingre,ids);
+        //find what every id can make, writes to an output file
         findWhatEveryoneCanMake(ids);
     }
 }
