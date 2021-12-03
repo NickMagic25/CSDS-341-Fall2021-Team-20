@@ -1,14 +1,10 @@
 package Querys;
-import javax.xml.transform.Result;
 import java.io.*;
-import java.nio.Buffer;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Random;
-import java.sql.*;
 
 
 public class TestingClass {
@@ -32,20 +28,6 @@ public class TestingClass {
         return indecies;
     }
 
-    private static void fileToList(List<String> out, Scanner sc){
-        try
-        {
-            while(sc.hasNextLine())
-            {
-                System.out.println("Adding " + sc.nextLine() + " to list");
-                out.add(sc.nextLine());
-            }
-        }
-        catch(NoSuchElementException e ){
-            System.out.println("Blank line in file");
-        }
-    }
-
     private static File makeFile()
     {
         try{
@@ -64,17 +46,6 @@ public class TestingClass {
         return null;
     }
 
-    private static void writeToFile(BufferedWriter wr, String line)
-    {
-        try
-        {
-            wr.append(line);
-        } catch (IOException e) {
-            System.out.println("Could not write to file");
-            e.printStackTrace();
-        }
-    }
-
     // takes in some common ingredients from a txt file and then 2000 random ingredients
     // updates the nutrition ID for them as well with random vals
     private static List<String> addIngredients()
@@ -84,29 +55,23 @@ public class TestingClass {
         for(int i=0;i<=4000;i++){
             ingredients.add("test ingredient " + findRandNum());
         }
-        try
+        //fileToList(ingredients, new Scanner(file)); not needed anymore
+        for(String name:ingredients)
         {
-            fileToList(ingredients, new Scanner(file));
-            for(String name:ingredients)
-            {
-                if(!database.FIE(name,cnnStr))
-                    database.AI(name,cnnStr);
+            if(!database.FIE(name,cnnStr))
+                database.AI(name,cnnStr);
 
-                else
-                    System.out.println(name + " already in database");
-                //get random values for protien, carbs, and fat
-                String p=String.valueOf(findRandNum());
-                String c= String.valueOf(findRandNum());
-                String f= String.valueOf(findRandNum());
-                //generate a new nutrition ID
-                String nID=database.newNutrition(p,c,f,cnnStr);
-                //update the ingredient's nutrition id
-                database.updateNutritionIDIngre(name,nID,cnnStr);
-                System.out.println("Updated nutrition ID for " + name);
-            }
-        }
-        catch (FileNotFoundException e) {
-            System.out.println(System.getProperty("user.dir"));
+            else
+                System.out.println(name + " already in database");
+            //get random values for protien, carbs, and fat
+            String p=String.valueOf(findRandNum());
+            String c= String.valueOf(findRandNum());
+            String f= String.valueOf(findRandNum());
+            //generate a new nutrition ID
+            String nID=database.newNutrition(p,c,f,cnnStr);
+            //update the ingredient's nutrition id
+            database.updateNutritionIDIngre(name,nID,cnnStr);
+            System.out.println("Updated nutrition ID for " + name);
         }
         return ingredients;
     }
@@ -158,9 +123,9 @@ public class TestingClass {
             FileWriter wr=new FileWriter(log);
             for(String id:ids){
                 String line="User " + id + " can make: \n";
-                ResultSet ans=database.FAR(id,cnnStr);
-                while(ans.next())
-                    line+= ans.getString("Recipe_Name") +"\n";
+                ArrayList<String> recipes= (ArrayList<String>) database.FAR(id,cnnStr);
+                for(String recipe: recipes)
+                    line+= recipe+"\n";
                 line+="\n \n \n \n";
                 wr.write(line);
                 wr.flush();
@@ -169,10 +134,6 @@ public class TestingClass {
         }
         catch (IOException e) {
             System.out.println("Bad bad thing happen again");
-            e.printStackTrace();
-        }
-        catch (SQLException e) {
-            System.out.println("I don't have a next");
             e.printStackTrace();
         }
 

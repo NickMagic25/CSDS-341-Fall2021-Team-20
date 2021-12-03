@@ -3,6 +3,8 @@ package Querys;
 import java.sql.*;
 import java.util.Locale;
 import java.util.Random;
+import java.util.List;
+import java.util.ArrayList;
 
 public class ExampleQuery {
 	public static void main(String[] args) {
@@ -222,20 +224,23 @@ public class ExampleQuery {
 	}
 
 	// finds all recipes a user can make
-	public ResultSet FAR(String user_ID,String cnnStr){
+	public List<String> FAR(String user_ID,String cnnStr){
 		System.out.println("Finding all recipes you can make");
 		String sql="SELECT u.Recipe_Name FROM [Uses] as u  WHERE u.Amount_of <= all (Select h.Serving_Size as Amount_Of From [Has] as h WHERE h.User_Id="+ user_ID+ " )";
 		ResultSet ans=null;
+		ArrayList<String> recipes=new ArrayList<String>();
 		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
 			ans = statement.executeQuery(sql);
 			while(ans.next()) {
-				System.out.println("You can make "+ ans.getString("Recipe_Name"));
+				String r=ans.getString("Recipe_Name");
+				System.out.println("You can make "+ r);
+				recipes.add(r);
 			}
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return ans;
+		return recipes;
 	}
 	
 	/***
@@ -285,10 +290,11 @@ public class ExampleQuery {
 	 */
 	private boolean FTP(String Name, String cnnStr) {
 		System.out.println("Finding " + Name);
-		ResultSet resultSet = FARWGTP(Name, cnnStr);
-		try{
-			if(!resultSet.wasNull())
-				return true;
+		String sql = "Select * From [Taste_Profile] Where [Taste] = '" + Name.toLowerCase() +"'";
+		ResultSet resultSet = null;
+		try(Connection cnn = DriverManager.getConnection(cnnStr); Statement statement = cnn.createStatement();){
+			resultSet = statement.executeQuery(sql);
+			return resultSet.next();
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -322,7 +328,7 @@ public class ExampleQuery {
 	 */
 	public void AHT(String Taste, String R_Name, String cnnStr) {
 		System.out.println("Adding Has_Taste into database");
-		String sql = "Insert into [Has_Taste]([Taste], [R_Name], [Name]) Values('" + Taste.toLowerCase() + "', '" + R_Name.toLowerCase() + "', '+" + R_Name.toLowerCase() + "')";
+		String sql = "Insert into [Has_Taste]([Taste], [R_Name], [Name]) Values('" + Taste.toLowerCase() + "', '" + R_Name.toLowerCase() + "', '" + R_Name.toLowerCase() + "')";
 		try(Connection cnn = DriverManager.getConnection(cnnStr); PreparedStatement statement = cnn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
 			ResultSet resultSet = null;
 			statement.execute();
@@ -332,6 +338,7 @@ public class ExampleQuery {
 			}
 		}
 		catch(SQLException e) {
+			System.out.println(Taste.toLowerCase() + " " + R_Name.toLowerCase());
 			e.printStackTrace();
 		}
 	}
