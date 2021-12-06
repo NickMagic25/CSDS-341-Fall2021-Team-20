@@ -86,19 +86,25 @@ public class TestingClass {
             //has 20 ingredients max
             int r_size = findRandNum(20);
             int[] index = findRandIndex(r_size, len);
-            String ingredients=ingre.get(index[0]);
-            for(int j=1;j< index.length;j++)
-                ingredients+="," + ingre.get(index[j]);
-            //System.out.println("Adding a recipe with ingredients: " + ingredients);
-            database.AR("test recipe" + findRandNum(),"Do the thing with the other thing and boom food", "2", "unknown", ingredients, cnnStr );
-            String[] pantry= ingredients.split(",");
-            String randId=ids.get(findRandNum(ids.size()-1));
-            for(String name:pantry)
-                database.addIngredientToPantry(randId,name,String.valueOf(findRandNum(100)),cnnStr);
-            i++;
+            try{
+                String ingredients=ingre.get(index[0]);
+                for(int j=1;j< index.length;j++)
+                    ingredients+="," + ingre.get(index[j]);
+                //System.out.println("Adding a recipe with ingredients: " + ingredients);
+                database.AR("test recipe" + findRandNum(),"Do the thing with the other thing and boom food", "2", "unknown", ingredients, cnnStr );
+                String[] pantry= ingredients.split(",");
+                String randId=ids.get(findRandNum(ids.size()-1));
+                for(String name:pantry)
+                    database.addIngredientToPantry(randId,name,String.valueOf(findRandNum(100)),cnnStr);
+                i++;
+            }
+            catch(ArrayIndexOutOfBoundsException e){
+                System.out.println("Failed when indexes are " + index);
+                e.printStackTrace();
+            }
         }
-    }
 
+    }
     // generates 1000 new users
     private static List<String> newUsers()
     {

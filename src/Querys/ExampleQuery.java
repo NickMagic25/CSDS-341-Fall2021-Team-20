@@ -408,9 +408,6 @@ public class ExampleQuery {
 			if(exist[i]!=null && !exist[i])
 				AI(Ingredient[i], cnnStr);
 		}
-		if(!FTP(Taste, cnnStr)) {
-			ATP(Taste, Name, cnnStr);
-		}
 		String sql = "Insert into [Recipe]([Name], [Instructions], [Diffculty_Level], [Nutrition_ID], [Taste_Profile]) "
 				+ "Values('"+ Name.toLowerCase() +"', '" + instructions + "', " + Diff + ", -1, '" + Taste + "')";
 		try(Connection cnn = DriverManager.getConnection(cnnStr);
@@ -425,6 +422,9 @@ public class ExampleQuery {
 			catch(SQLException e) {
 				e.printStackTrace();
 			}
+		if(!FTP(Taste, cnnStr)) {
+			ATP(Taste, Name, cnnStr);
+		}
 		AHT(Taste, Name, cnnStr);
 		AMC(Name, "-1", cnnStr);
 		for(String i: Ingredient) {
